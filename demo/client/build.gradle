@@ -1,0 +1,64 @@
+plugins {
+	id 'org.springframework.boot'
+	id 'io.spring.dependency-management' 
+	id 'java'
+	id 'org.openapi.generator' version '4.3.1'
+}
+
+ext {
+    openApiOutputDir = "$rootDir/build/generated/openapi"
+}
+
+sourceSets.main.java.srcDirs += ["$openApiOutputDir//src/main/java"]
+
+group = 'com.client'
+version = '0.0.1-SNAPSHOT'
+// sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	// // これらは自動生成クラスが import しているので必要
+     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.1'
+    compileOnly 'io.swagger:swagger-annotations:1.6.2'
+	//swagger-ui 導入
+	 implementation "io.springfox:springfox-boot-starter:3.0.0"
+    // implementation "io.springfox:springfox-swagger2:3.0.0"
+    // implementation "io.springfox:springfox-swagger-ui:3.0.0"
+	//junit
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+}
+
+test {
+	useJUnitPlatform()
+	testLogging.showStandardStreams=true
+	testLogging {
+		events "passed","skipped","failed"
+	}
+}
+
+openApiGenerate {
+    generatorName = 'spring'
+    inputSpec = "$rootDir/specs/pettest.yml"
+    outputDir = "$openApiOutputDir"
+    apiPackage = 'org.openapi.example.api'
+    invokerPackage = 'org.openapi.example.invoker'
+    modelPackage = 'org.openapi.example.model'
+    configOptions = [
+        dateLibrary: 'java8',
+        interfaceOnly: 'true',
+        skipDefaultInterface: 'true',
+    ]
+    systemProperties = [
+        modelDocs: 'true'
+    ]
+}
+
+compileJava.dependsOn tasks.openApiGenerate

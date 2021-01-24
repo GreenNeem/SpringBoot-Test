@@ -1,0 +1,3 @@
+rootProject.name = 'demo'
+// rootProject.projectDir = new File(settingsDir, 'demo')
+include 'client'
